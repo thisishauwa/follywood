@@ -1,0 +1,29 @@
+{
+  "name": "talk-to-august-migration",
+  "version": "1.0.0",
+  "description": "Firebase to Supabase migration scripts for Talk to August",
+  "main": "migrate.js",
+  "scripts": {
+    "validate": "node validate.js",
+    "migrate:auth": "node migrate.js --phase=auth",
+    "migrate:data": "node migrate.js --phase=data",
+    "migrate:storage": "node migrate.js --phase=storage",
+    "migrate:all": "node migrate.js --phase=all",
+    "dry-run": "node migrate.js --phase=all --dry-run",
+    "test": "npm run validate"
+  },
+  "keywords": [
+    "firebase",
+    "supabase",
+    "migration",
+    "talk-to-august"
+  ],
+  "author": "Talk to August Team",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

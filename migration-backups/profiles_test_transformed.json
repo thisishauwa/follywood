@@ -1,0 +1,47 @@
+[
+  {
+    "id": "04w6G0Vr3hNurdzTLf0f7hMzCWE2",
+    "username": "Saratu Attah",
+    "age_range": "16 - 24",
+    "gender": "dating",
+    "sexuality": "",
+    "onboarding_completed": false,
+    "points": 0,
+    "updated_at": "2025-07-08T10:07:51.311Z"
+  },
+  {
+    "id": "05mxc1nv72WgJQex0WLLALSinW33",
+    "username": "Ayshaimahn",
+    "age_range": "18 - 24",
+    "gender": "female",
+    "sexuality": "straight",
+    "relationship_status": "In a relationship",
+    "onboarding_completed": false,
+    "points": 0,
+    "updated_at": "2025-07-08T10:07:51.313Z"
+  },
+  {
+    "id": "07TGcdE2DhU5tj5h3WiVyb2lDQ92",
+    "username": "siyama2tu",
+    "onboarding_completed": false,
+    "points": 0,
+    "updated_at": "2025-07-08T10:07:51.313Z"
+  },
+  {
+    "id": "0877GVLuC1PP2rwoTHFwT8O6ljD3",
+    "username": "Odii Daniel",
+    "onboarding_completed": false,
+    "points": 0,
+    "updated_at": "2025-07-08T10:07:51.313Z"
+  },
+  {
+    "id": "0A2jThrWr4QjJS6CPQpzSforX9Q2",
+    "username": "Oluwatobi Raheem",
+    "age_range": "35 - 44",
+    "gender": "single",
+    "sexuality": "",
+    "onboarding_completed": false,
+    "points": 0,
+    "updated_at": "2025-07-08T10:07:51.313Z"
+  }
+]

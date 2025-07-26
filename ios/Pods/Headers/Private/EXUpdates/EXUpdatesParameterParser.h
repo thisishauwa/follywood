@@ -1,0 +1,1 @@
+../../../../../node_modules/.pnpm/expo-updates@0.28.15_expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_react_4cdbe60d9ef8e8df3d0048827e1a4971/node_modules/expo-updates/ios/EXUpdates/Multipart/EXUpdatesParameterParser.h

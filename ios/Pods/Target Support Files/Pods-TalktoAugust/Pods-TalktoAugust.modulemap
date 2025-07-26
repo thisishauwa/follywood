@@ -1,0 +1,6 @@
+module Pods_TalktoAugust {
+  umbrella header "Pods-TalktoAugust-umbrella.h"
+
+  export *
+  module * { export * }
+}

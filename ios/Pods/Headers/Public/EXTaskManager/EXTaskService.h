@@ -1,0 +1,1 @@
+../../../../../node_modules/.pnpm/expo-task-manager@13.1.6_expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_r_77279fdf6277c99aaa77e7e18282b531/node_modules/expo-task-manager/ios/EXTaskManager/EXTaskService.h

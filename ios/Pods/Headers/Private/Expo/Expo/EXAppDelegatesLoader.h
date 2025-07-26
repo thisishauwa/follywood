@@ -1,0 +1,1 @@
+../../../../../../node_modules/.pnpm/expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_react-native@0.79.4_@babel_ae61d227887dbcbff7cbabbb7a1a543f/node_modules/expo/ios/AppDelegates/EXAppDelegatesLoader.h

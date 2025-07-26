@@ -1,0 +1,1 @@
+../../../../../node_modules/.pnpm/expo-av@15.1.6_expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_react-nativ_4c3ba4136fbdfb27bf8ccb079e1e2d86/node_modules/expo-av/ios/EXAV/EXAVObject.h

@@ -1,0 +1,1 @@
+../../../../../node_modules/.pnpm/expo-constants@17.1.6_expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_reac_f06f2dc8a91c113ea55ea7fa0c43cdce/node_modules/expo-constants/ios/EXConstantsInstallationIdProvider.h

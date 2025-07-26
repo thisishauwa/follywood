@@ -1,0 +1,1 @@
+../../../../../node_modules/.pnpm/expo-file-system@18.1.10_expo@53.0.13_@babel+core@7.27.7_react-native-webview@13.13.5_r_a4494a47e32d9c608a0eb5eadb8bf37f/node_modules/expo-file-system/ios/EXFileSystemAssetLibraryHandler.h

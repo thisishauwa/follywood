@@ -1,0 +1,1 @@
+../../../../../../node_modules/.pnpm/react-native@0.79.4_@babel+core@7.27.7_@react-native-community+cli@18.0.0_typescript@5._3681ad713d0f1ca814739aabc3aaf006/node_modules/react-native/React/Views/RCTBorderStyle.h

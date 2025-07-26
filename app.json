@@ -1,0 +1,98 @@
+{
+  "expo": {
+    "name": "talk-to-august",
+    "slug": "talk-to-august",
+    "owner": "famasi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/headerimg.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "talktoaugust",
+    "splash": {
+      "image": "./assets/images/ttalogo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff",
+      "imageWidth": 120,
+      "imageHeight": 120
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mycompany.talktoaugust",
+      "backgroundModes": [
+        "audio",
+        "audio"
+      ],
+      "usesNonExemptEncryption": false,
+      "associatedDomains": ["applinks:talktoaugust.app"],
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow access to your photo library to select and share photos.",
+        "NSSpeechRecognitionUsageDescription": "Enable speech recognition to convert your voice to text for improved accessibility and user experience.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "com.mycompany.talktoaugust",
+            "CFBundleURLSchemes": ["com.mycompany.talktoaugust", "talktoaugust"]
+          },
+          {
+            "CFBundleURLName": "GoogleSignIn",
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.684543336164-lq1no9mmc7ocmg3affpabr2uqamhdhp"]
+          }
+        ],
+        "com.apple.developer.applesignin": ["Default"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/headerimg.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.mycompany.talktoaugust",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "talktoaugust"
+            },
+            {
+              "scheme": "com.mycompany.talktoaugust"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/headerimg.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/ttalogo.png",
+          "imageWidth": 120,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/images/ttalogo.png",
+            "backgroundColor": "#ffffff"
+          }
+        }
+      ],
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.684543336164-lq1no9mmc7ocmg3affpabr2uqamhdhp"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3ff8458c-d0f7-4530-91f6-da3f267980ef"
+      }
+    }
+  }
+}
