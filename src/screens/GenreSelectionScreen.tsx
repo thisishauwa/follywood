@@ -8,11 +8,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useAuth } from "../contexts/AuthContext";
-import { ArrowLeft2 } from "iconsax-react-nativejs";
+import { ArrowLeft2, TickCircle } from "iconsax-react-nativejs";
 import { supabase } from "../services/supabase";
 
 // Navigation types
@@ -34,8 +35,8 @@ interface GenreSelectionScreenProps {
 // --- Main GenreSelectionScreen Component ---
 const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
   const [loading, setLoading] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const { user, signOut } = useAuth();
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const { user, signOut, refreshProfile } = useAuth();
 
   const genres = [
     "Action", "Comedy", "Drama", "Horror", 
@@ -74,32 +75,58 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
   );
 
   const handleContinue = async () => {
-    if (!selectedGenre) {
-      Alert.alert("Select a Genre", "Please choose your preferred genre.");
+    console.log('handleContinue called');
+    console.log('selectedGenres:', selectedGenres);
+    console.log('user:', user);
+    
+    if (selectedGenres.length === 0) {
+      console.log('No genres selected');
+      Alert.alert("Select Genres", "Please choose at least one genre.");
+      return;
+    }
+    if (selectedGenres.length > 3) {
+      console.log('Too many genres selected:', selectedGenres.length);
+      Alert.alert("Too Many Genres", "Please select up to 3 genres only.");
       return;
     }
     if (!user?.id) {
+      console.log('No user ID found');
       Alert.alert("Error", "No user found. Please sign in again.");
       return;
     }
 
+    console.log('Starting profile update...');
     setLoading(true);
     try {
+      // Store the first genre in the genre field for compatibility
+      // and store all selected genres in the selected_genres array
+      const updateData = {
+        genre: selectedGenres[0], // Primary genre for compatibility
+        selected_genres: selectedGenres, // All selected genres as array
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      };
+      console.log('Update data:', updateData);
+      console.log('All selected genres:', selectedGenres);
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          genre: selectedGenre,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) {
         console.error('Error completing onboarding:', error);
-        Alert.alert("Error", "Failed to save your genre preference. Please try again.");
+        Alert.alert("Error", "Failed to save your genre preferences. Please try again.");
         return;
       }
 
+      console.log('Profile updated successfully!');
+      
+      // Manually refresh the user profile to trigger navigation
+      console.log('Calling refreshProfile to update user state...');
+      await refreshProfile();
+      
+      console.log('Profile refreshed, navigation should happen automatically');
       // Onboarding is now complete, user will be redirected to MainTabs automatically
     } catch (error) {
       console.error('Unexpected error completing onboarding:', error);
@@ -126,20 +153,41 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
     );
   };
 
-  const renderGenreButton = (genre: string, isSelected: boolean) => (
-    <TouchableOpacity
-      key={genre}
-      style={[styles.genreButton, isSelected && styles.genreButtonSelected]}
-      onPress={() => setSelectedGenre(genre)}
-    >
-      <Text style={[styles.genreText, isSelected && styles.genreTextSelected]}>
-        {genre}
-      </Text>
-      <View style={[styles.radioButton, isSelected && styles.radioButtonSelected]}>
-        {isSelected && <View style={styles.radioButtonInner} />}
-      </View>
-    </TouchableOpacity>
-  );
+  const handleGenreToggle = (genre: string) => {
+    if (selectedGenres.includes(genre)) {
+      // Remove genre if already selected
+      setSelectedGenres(selectedGenres.filter(g => g !== genre));
+    } else {
+      // Add genre if not selected and under limit
+      if (selectedGenres.length < 3) {
+        setSelectedGenres([...selectedGenres, genre]);
+      } else {
+        Alert.alert("Maximum Reached", "You can select up to 3 genres only.");
+      }
+    }
+  };
+
+  const renderGenreButton = (genre: string) => {
+    const isSelected = selectedGenres.includes(genre);
+    return (
+      <TouchableOpacity
+        key={genre}
+        style={[styles.genreButton, isSelected && styles.genreButtonSelected]}
+        onPress={() => handleGenreToggle(genre)}
+      >
+        <Text style={[styles.genreText, isSelected && styles.genreTextSelected]}>
+          {genre}
+        </Text>
+        <View style={styles.iconContainer}>
+          {isSelected ? (
+            <TickCircle size={24} color="#FFFFFF" variant="Bold" />
+          ) : (
+            <View style={styles.radioButton} />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -151,38 +199,43 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
         <ProgressDots currentStep={2} totalSteps={3} />
       </View>
 
-      {/* Main content */}
-      <View style={styles.content}>
+      {/* Main content - Scrollable */}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.welcomeSection}>
           <Text style={styles.welcomeText}>Sounds... great 👍🏽</Text>
           <Text style={styles.questionText}>What are you into?</Text>
+          <Text style={styles.subText}>Choose up to 3 genres ({selectedGenres.length}/3)</Text>
         </View>
 
         {/* Genre Grid */}
         <View style={styles.genreGrid}>
           <View style={styles.genreRow}>
-            {renderGenreButton("Action", selectedGenre === "Action")}
-            {renderGenreButton("Comedy", selectedGenre === "Comedy")}
+            {renderGenreButton("Action")}
+            {renderGenreButton("Comedy")}
           </View>
           <View style={styles.genreRow}>
-            {renderGenreButton("Drama", selectedGenre === "Drama")}
-            {renderGenreButton("Horror", selectedGenre === "Horror")}
+            {renderGenreButton("Drama")}
+            {renderGenreButton("Horror")}
           </View>
           <View style={styles.genreRow}>
-            {renderGenreButton("Romance", selectedGenre === "Romance")}
-            {renderGenreButton("Thriller", selectedGenre === "Thriller")}
+            {renderGenreButton("Romance")}
+            {renderGenreButton("Thriller")}
           </View>
           <View style={styles.genreRow}>
-            {renderGenreButton("Biopics", selectedGenre === "Biopics")}
-            {renderGenreButton("Art House", selectedGenre === "Art House")}
+            {renderGenreButton("Biopics")}
+            {renderGenreButton("Art House")}
           </View>
           <View style={styles.genreRow}>
-            {renderGenreButton("Sci-fi", selectedGenre === "Sci-fi")}
-            {renderGenreButton("Fantasy", selectedGenre === "Fantasy")}
+            {renderGenreButton("Sci-fi")}
+            {renderGenreButton("Fantasy")}
           </View>
           <View style={styles.genreRow}>
-            {renderGenreButton("Animation", selectedGenre === "Animation")}
-            {renderGenreButton("Docs", selectedGenre === "Docs")}
+            {renderGenreButton("Animation")}
+            {renderGenreButton("Docs")}
           </View>
         </View>
 
@@ -190,13 +243,19 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
         <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
           <Text style={styles.signOutText}>Need to start over? Sign out</Text>
         </TouchableOpacity>
-      </View>
+        
+        {/* Bottom padding to ensure content can scroll above the button */}
+        <View style={styles.bottomPadding} />
+      </ScrollView>
 
       {/* Bottom continue button */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           style={[styles.continueButton, loading && styles.continueButtonDisabled]}
-          onPress={handleContinue}
+          onPress={() => {
+            console.log('TouchableOpacity pressed!');
+            handleContinue();
+          }}
           disabled={loading}
         >
           {loading ? (
@@ -246,14 +305,17 @@ const styles = StyleSheet.create({
   progressDotInactive: {
     backgroundColor: '#F0EEE9',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 140, // Extra padding to scroll above the button
   },
   welcomeSection: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: 20, // Moved up further
+    marginBottom: 30, // Reduced bottom margin
   },
   welcomeText: {
     fontSize: 16,
@@ -267,6 +329,13 @@ const styles = StyleSheet.create({
     color: '#343333',
     fontFamily: 'BuenosAires-SemiBold',
     textAlign: 'center',
+    marginBottom: 8,
+  },
+  subText: {
+    fontSize: 14,
+    color: '#8C8C8C',
+    fontFamily: 'BuenosAires-Book',
+    textAlign: 'center',
   },
   genreGrid: {
     gap: 12,
@@ -278,9 +347,9 @@ const styles = StyleSheet.create({
   },
   genreButton: {
     flex: 1,
-    height: 64,
+    minHeight: 64, // Changed from fixed height to minHeight
     paddingHorizontal: 16,
-    paddingVertical: 24,
+    paddingVertical: 20, // Reduced padding to give more space for text
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 2,
@@ -296,10 +365,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'BuenosAires-Book',
     color: '#DA4500',
+    flex: 1, // Allow text to take available space
+    marginRight: 8, // Add some space before the radio button
   },
   genreTextSelected: {
     color: '#FFFFFF',
     fontFamily: 'BuenosAires-SemiBold',
+    flex: 1,
+    marginRight: 8,
+  },
+  iconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   radioButton: {
     width: 24,
@@ -307,22 +386,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     borderColor: '#DA4500',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButtonSelected: {
-    backgroundColor: 'transparent',
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 6,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 1,
   },
   signOutButton: {
     alignSelf: 'center',
     marginTop: 30,
     padding: 10,
+  },
+  bottomPadding: {
+    height: 20, // Extra space at the bottom
   },
   signOutText: {
     color: '#8C8C8C',
@@ -332,6 +403,10 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   bottomContainer: {
+    position: 'absolute', // Make it fixed at the bottom
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#2201B2',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,

@@ -164,6 +164,11 @@ function AppNavigator() {
     );
   }
 
+  // Debug navigation state
+  console.log('App navigation - user exists:', !!user);
+  console.log('App navigation - user profile:', user?.profile);
+  console.log('App navigation - onboarding_completed:', user?.profile?.onboarding_completed);
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (

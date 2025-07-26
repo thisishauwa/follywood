@@ -76,7 +76,7 @@ export const MainTabs = () => {
         screenOptions={{ headerShown: false }}
         tabBar={(props) => <BottomNavBar {...props} />}
       >
-        <Tab.Screen name="Home" component={HomeScreenWithFAB} />
+        <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Explore" component={ExploreScreenWithFAB} />
         <Tab.Screen name="Journal" component={JournalScreenWithFAB} />
         <Tab.Screen name="Goals" component={GoalsScreenWithFAB} />

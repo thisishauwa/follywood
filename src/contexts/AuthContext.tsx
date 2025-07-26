@@ -18,6 +18,7 @@ export interface Profile {
   onboarding_completed?: boolean
   studio_name?: string
   genre?: string
+  selected_genres?: string[]
   referral_code?: string
   referred_by?: string
   points?: number
@@ -47,6 +48,7 @@ interface AuthContextType {
   signInWithApple: () => Promise<AuthResponse>
   signOut: () => Promise<AuthResponse>
   refreshSubscriptionStatus: () => Promise<void>
+  refreshProfile: () => Promise<void>
   completeStudioCreation: (studioName: string, genre: string) => Promise<{ success: boolean; error?: any; }>
 }
 
@@ -367,6 +369,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshProfile = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) {
+        console.error('Error refreshing profile:', error);
+        return;
+      }
+      
+      if (profile) {
+        console.log('Profile refreshed:', profile);
+        setUser(currentUser => 
+          currentUser ? { ...currentUser, profile } : null
+        );
+        
+        // Cache the updated profile
+        try {
+          await AsyncStorage.setItem(`profile_${user.id}`, JSON.stringify(profile));
+        } catch (cacheError) {
+          console.error('Error caching refreshed profile:', cacheError);
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected error refreshing profile:', error);
+    }
+  };
+
   const isSubscribed = (() => {
     if (!user?.subscription) return false;
 
@@ -397,6 +432,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithApple,
     signOut,
     refreshSubscriptionStatus,
+    refreshProfile,
     completeStudioCreation,
   }
 

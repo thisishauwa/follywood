@@ -16,6 +16,7 @@ CREATE TABLE profiles (
     full_name TEXT,
     studio_name TEXT,
     genre TEXT CHECK (genre IN ('Action', 'Comedy', 'Drama', 'Horror', 'Romance', 'Thriller', 'Biopics', 'Art House', 'Sci-fi', 'Fantasy', 'Animation', 'Docs')),
+    selected_genres JSONB DEFAULT '[]'::jsonb,
     onboarding_completed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -418,9 +419,19 @@ CREATE TRIGGER update_talent_updated_at BEFORE UPDATE ON talent FOR EACH ROW EXE
 -- Function to automatically create a studio when a user completes onboarding
 CREATE OR REPLACE FUNCTION create_studio_on_onboarding()
 RETURNS TRIGGER AS $$
+DECLARE
+    mapped_genre_focus TEXT;
 BEGIN
     -- Only create studio if onboarding was just completed
     IF OLD.onboarding_completed = FALSE AND NEW.onboarding_completed = TRUE THEN
+        -- Map profile genre to studio genre_focus
+        CASE NEW.genre
+            WHEN 'Horror' THEN mapped_genre_focus := 'Horror';
+            WHEN 'Comedy' THEN mapped_genre_focus := 'Comedy';
+            WHEN 'Drama', 'Romance', 'Biopics' THEN mapped_genre_focus := 'Art House';
+            ELSE mapped_genre_focus := 'Blockbuster';
+        END CASE;
+        
         -- Find or create a league with available spots
         INSERT INTO studios (user_id, league_id, studio_name, genre_focus)
         VALUES (
@@ -429,7 +440,7 @@ BEGIN
                 (SELECT COUNT(*) FROM studios WHERE league_id = leagues.id) < max_players 
                 LIMIT 1),
             NEW.studio_name,
-            NEW.genre
+            mapped_genre_focus
         );
     END IF;
     RETURN NEW;
