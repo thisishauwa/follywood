@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "talk-to-august",
-    "slug": "talk-to-august",
-    "owner": "famasi",
+    "name": "Fantasy Film League",
+    "slug": "fantasy-film-league",
+    "owner": "thisishauwa",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/headerimg.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "scheme": "talktoaugust",
+    "newArchEnabled": false,
+    "scheme": "fantasyfilmleague",
     "splash": {
       "image": "./assets/images/ttalogo.png",
       "resizeMode": "contain",
@@ -18,7 +18,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mycompany.talktoaugust",
+      "bundleIdentifier": "com.thisishauwa.fantasyfilmleague",
       "backgroundModes": [
         "audio",
         "audio"
@@ -31,8 +31,8 @@
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleURLTypes": [
           {
-            "CFBundleURLName": "com.mycompany.talktoaugust",
-            "CFBundleURLSchemes": ["com.mycompany.talktoaugust", "talktoaugust"]
+            "CFBundleURLName": "com.thisishauwa.fantasyfilmleague",
+            "CFBundleURLSchemes": ["com.thisishauwa.fantasyfilmleague", "fantasyfilmleague"]
           },
           {
             "CFBundleURLName": "GoogleSignIn",
@@ -48,16 +48,16 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.mycompany.talktoaugust",
+      "package": "com.thisishauwa.fantasyfilmleague",
       "intentFilters": [
         {
           "action": "VIEW",
           "data": [
             {
-              "scheme": "talktoaugust"
+              "scheme": "fantasyfilmleague"
             },
             {
-              "scheme": "com.mycompany.talktoaugust"
+              "scheme": "com.thisishauwa.fantasyfilmleague"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

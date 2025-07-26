@@ -1,5 +1,5 @@
 {
-  "name": "talk-to-august",
+  "name": "fantasy-film-league",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
@@ -26,6 +26,7 @@
     "expo-apple-authentication": "^7.2.4",
     "expo-av": "~15.1.7",
     "expo-background-fetch": "~13.1.6",
+    "expo-constants": "^17.1.7",
     "expo-crypto": "^14.1.5",
     "expo-dev-client": "~5.2.4",
     "expo-font": "~13.3.2",
@@ -39,6 +40,7 @@
     "immer": "^10.1.1",
     "lucide-react-native": "^0.525.0",
     "nativewind": "^4.1.23",
+    "prop-types": "^15.8.1",
     "react": "19.0.0",
     "react-hook-form": "^7.60.0",
     "react-native": "0.79.5",

@@ -12,12 +12,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthProvider, useAuth, navigationRef } from './src/contexts/AuthContext';
 
 // Screens
-import AboutYouScreen from './src/screens/AboutYouScreen';
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
-import GettingStartedScreen from './src/screens/GettingStartedScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import StudioCreationScreen from './src/screens/StudioCreationScreen';
 // import HomeScreen from './src/screens/HomeScreen';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -29,6 +28,8 @@ import ChatScreen from './src/screens/ChatScreen';
 import CreateGoalScreen from './src/screens/CreateGoalScreen';
 import EditPasswordScreen from './src/screens/EditPasswordScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
+import FullNameScreen from './src/screens/FullNameScreen';
+import GenreSelectionScreen from './src/screens/GenreSelectionScreen';
 import GoalsScreen from './src/screens/GoalsScreen';
 import JournalEntryScreen from './src/screens/JournalEntryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -39,8 +40,9 @@ import SubscriptionScreen from './src/screens/SubscriptionScreen';
 
 export type RootStackParamList = {
   Onboarding: undefined;
-  GettingStarted: undefined;
-  AboutYou: undefined;
+  FullName: undefined;
+  StudioCreation: undefined;
+  GenreSelection: undefined;
   CreateAccount: undefined;
   Login: undefined;
   ForgotPassword: undefined;
@@ -111,7 +113,7 @@ const AppRouter = () => {
     if (user) {
       const isOnboarded = user.profile?.onboarding_completed;
       const mainAppScreens: (keyof RootStackParamList)[] = ['MainTabs', 'Chat', 'JournalEntry', 'Goals', 'CreateGoal', 'AudioGuides', 'Profile'];
-      const onboardingScreens: (keyof RootStackParamList)[] = ['GettingStarted', 'AboutYou'];
+      const onboardingScreens: (keyof RootStackParamList)[] = ['StudioCreation'];
 
       if (isOnboarded) {
         // If user is onboarded and on an onboarding screen, navigate to Home.
@@ -121,7 +123,7 @@ const AppRouter = () => {
       } else {
         // If user is not onboarded and on a main app screen, navigate to GettingStarted.
         if (mainAppScreens.includes(currentRoute as keyof RootStackParamList)) {
-          navigation.reset({ index: 0, routes: [{ name: 'GettingStarted' }] });
+          navigation.reset({ index: 0, routes: [{ name: 'StudioCreation' }] });
         }
       }
     }
@@ -134,109 +136,70 @@ function AppNavigator() {
   const { user, loading } = useAuth();
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
 
-  // Check if this is a first-time user
   useEffect(() => {
     const checkFirstTimeUser = async () => {
       try {
         const hasOpenedBefore = await AsyncStorage.getItem('hasOpenedBefore');
-        if (!hasOpenedBefore) {
-          // Mark as opened and set as first-time user
+        if (hasOpenedBefore === null) {
           await AsyncStorage.setItem('hasOpenedBefore', 'true');
           setIsFirstTime(true);
         } else {
           setIsFirstTime(false);
         }
       } catch (error) {
-        console.error('Error checking first-time user:', error);
-        // Default to returning user if there's an error
-        setIsFirstTime(false);
+        console.error('Error checking first-time user status:', error);
+        setIsFirstTime(false); // Default to not first time on error
       }
     };
-
     checkFirstTimeUser();
   }, []);
 
-  // Show loading state while checking auth and first-time status
   if (loading || isFirstTime === null) {
     return (
-      <View style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF'
-      }}>
-        <Text style={{
-          fontSize: 16,
-          color: '#64748B',
-          fontFamily: 'Larsseit'
-        }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
+        <Text style={{ fontSize: 16, color: '#64748B', fontFamily: 'BuenosAires-Book' }}>
           Loading...
         </Text>
       </View>
     );
   }
 
-  const getInitialRoute = () => {
-    if (!user) {
-      if (isFirstTime) {
-        console.log('First-time user, routing to Onboarding')
-        return "Onboarding";
-      } else {
-        console.log('Returning user without session, routing to Login')
-        return "Login";
-      }
-    }
-
-    console.log('User found, checking onboarding status:', {
-      userId: user.id,
-      hasProfile: !!user.profile,
-      onboardingCompleted: user.profile?.onboarding_completed,
-      profileData: user.profile
-    })
-
-    if (!user.profile?.onboarding_completed) {
-      console.log('User has not completed onboarding, routing to GettingStarted')
-      return "GettingStarted";
-    }
-
-    console.log('User has completed onboarding, routing to MainTabs')
-    return "MainTabs";
-  };
-
   return (
-    <Stack.Navigator
-      initialRouteName={getInitialRoute()}
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        // Authenticated user screens
-        <>
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          <Stack.Screen
-            name="GettingStarted"
-            component={GettingStartedScreen}
-            options={{ headerLeft: () => null, gestureEnabled: false }}
-          />
-          <Stack.Screen name="AboutYou" component={AboutYouScreen} />
-          <Stack.Screen name="Chat" component={ChatScreen} />
-          <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
-          <Stack.Screen name="Goals" component={GoalsScreen} />
-          <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
-          <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-          <Stack.Screen name="EditPassword" component={EditPasswordScreen} />
-          <Stack.Screen name="Subscription" component={SubscriptionScreen} />
-          <Stack.Screen name="Store" component={StoreScreen} />
-          <Stack.Screen name="Rewards" component={RewardsScreen} />
-        </>
+        user.profile?.onboarding_completed ? (
+          // Fully onboarded user screens
+          <>
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
+            <Stack.Screen name="Goals" component={GoalsScreen} />
+            <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
+            <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="EditPassword" component={EditPasswordScreen} />
+            <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+            <Stack.Screen name="Store" component={StoreScreen} />
+            <Stack.Screen name="Rewards" component={RewardsScreen} />
+          </>
+        ) : (
+          // Authenticated but not onboarded user screens
+          <>
+            <Stack.Screen name="FullName" component={FullNameScreen} />
+            <Stack.Screen name="StudioCreation" component={StudioCreationScreen} />
+            <Stack.Screen name="GenreSelection" component={GenreSelectionScreen} />
+          </>
+        )
       ) : (
-        // Onboarding and auth screens for unauthenticated users
+        // Unauthenticated user screens
         <>
+          {isFirstTime ? (
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          ) : null}
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
         </>
       )}
@@ -249,27 +212,17 @@ export default function App() {
   const navigationRef = React.useRef<any>(null);
 
   const [fontsLoaded, fontsError] = useFonts({
-    'Larsseit': require('./assets/fonts/bodyfont/Larsseit_Regular.ttf'),
-    'LarsseitMedium': require('./assets/fonts/bodyfont/LarsseitMedium.otf'),
-    'LarsseitBold': require('./assets/fonts/bodyfont/LarsseitBold.otf'),
-    'LarsseitExtraBold': require('./assets/fonts/bodyfont/LarsseitExtraBold.otf'),
-    'LarsseitBoldItalic': require('./assets/fonts/bodyfont/LarsseitBoldItalic.otf'),
-    'LarsseitMediumItalic': require('./assets/fonts/bodyfont/LarsseitMediumItalic.otf'),
-    'LarsseitExtraBoldItalic': require('./assets/fonts/bodyfont/LarsseitExtraBoldItalic.otf'),
-    'Recoleta Regular': require('./assets/fonts/headerfont/Recoleta Regular.otf'),
-    'Recoleta Medium': require('./assets/fonts/headerfont/Recoleta Medium.otf'),
-    'Recoleta SemiBold': require('./assets/fonts/headerfont/Recoleta SemiBold.otf'),
-    'Recoleta Bold': require('./assets/fonts/headerfont/Recoleta Bold.otf'),
-    'Recoleta Light': require('./assets/fonts/headerfont/Recoleta Light.otf'),
-    'Recoleta Thin': require('./assets/fonts/headerfont/Recoleta Thin.otf'),
-    'Recoleta Black': require('./assets/fonts/headerfont/Recoleta Black.otf'),
-    'Recoleta Alt Regular': require('./assets/fonts/headerfont/Recoleta Alt Regular.otf'),
-    'Recoleta Alt Medium': require('./assets/fonts/headerfont/Recoleta Alt Medium.otf'),
-    'Recoleta Alt SemiBold': require('./assets/fonts/headerfont/Recoleta Alt SemiBold.otf'),
-    'Recoleta Alt Bold': require('./assets/fonts/headerfont/Recoleta Alt Bold.otf'),
-    'Recoleta Alt Light': require('./assets/fonts/headerfont/Recoleta Alt Light.otf'),
-    'Recoleta Alt Thin': require('./assets/fonts/headerfont/Recoleta Alt Thin.otf'),
-    'Recoleta Alt Black': require('./assets/fonts/headerfont/Recoleta Alt Black.otf'),
+    'BuenosAires-Black': require('./assets/fonts/body/BuenosAires-Black.ttf'),
+    'BuenosAires-BlackItalic': require('./assets/fonts/body/BuenosAires-BlackItalic.ttf'),
+    'BuenosAires-Bold': require('./assets/fonts/body/BuenosAires-Bold.ttf'),
+    'BuenosAires-BoldItalic': require('./assets/fonts/body/BuenosAires-BoldItalic.ttf'),
+    'BuenosAires-Book': require('./assets/fonts/body/BuenosAires-Book.ttf'),
+    'BuenosAires-BookItalic': require('./assets/fonts/body/BuenosAires-BookItalic.ttf'),
+    'BuenosAires-Light': require('./assets/fonts/body/BuenosAires-Light.ttf'),
+    'BuenosAires-RegularItalic': require('./assets/fonts/body/BuenosAires-RegularItalic.ttf'),
+    'BuenosAires-SemiBold': require('./assets/fonts/body/BuenosAires-SemiBold.ttf'),
+    'BuenosAires-SemiBoldItalic': require('./assets/fonts/body/BuenosAires-SemiBoldItalic.ttf'),
+    'BuenosAires-Thin': require('./assets/fonts/body/BuenosAires-Thin.ttf'),
   });
 
   useEffect(() => {
