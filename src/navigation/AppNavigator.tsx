@@ -3,12 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
-import ChatScreen from '../screens/ChatScreenClean';
-import JournalListScreen from '../screens/JournalListScreen';
-import JournalEntryScreen from '../screens/JournalEntryScreen';
-import GoalsScreen from '../screens/GoalsScreen';
-import CreateGoalScreen from '../screens/CreateGoalScreen';
-import AudioGuidesScreen from '../screens/AudioGuidesScreen';
+
 import ExploreScreen from '../screens/ExploreScreen';
 import ShopScreen from '../screens/ShopScreen';
 import StudiosScreen from '../screens/StudiosScreen';
@@ -23,23 +18,9 @@ import MovieDetailScreen from '../screens/MovieDetailScreen';
 import EditMovieScreen from '../screens/EditMovieScreen';
 
 import BottomNavBar from '../components/BottomNavBar';
-import MiniPlayer from '../components/MiniPlayer';
-import useAudioPlayerStore from '../stores/audioPlayerStore';
 
 export type AppStackParamList = {
   MainTabs: undefined;
-  Chat: { initialMessage?: string };
-  JournalEntry: { entryId?: string; existingEntry?: any; isEditMode?: boolean };
-  Goals: undefined;
-  CreateGoal: undefined;
-  AudioGuides: {
-    guideId: string;
-    title: string;
-    audioUrl?: string;
-    thumbnailUrl?: string;
-    description?: string;
-    lastPosition?: number;
-  };
   Studios: undefined;
   Profile: undefined;
   RecommendedForYou: undefined;
@@ -103,7 +84,7 @@ export const MainTabs = () => {
           options={{ tabBarButton: () => null }} 
         />
       </Tab.Navigator>
-      <MiniPlayer />
+
     </View>
   );
 };
@@ -112,10 +93,7 @@ export const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
-      <Stack.Screen name="Chat" component={ChatScreen} />
-      <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
-      <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
-      <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
+
       <Stack.Screen name="Studios" component={StudiosScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="RecommendedForYou" component={RecommendedForYouScreen} />

@@ -13,27 +13,17 @@ import { AuthProvider, useAuth, navigationRef } from './src/contexts/AuthContext
 
 // Screens
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
-import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import StudioCreationScreen from './src/screens/StudioCreationScreen';
-// import HomeScreen from './src/screens/HomeScreen';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-gesture-handler';
 import { PaystackProvider } from 'react-native-paystack-webview';
 import { MainTabs } from './src/navigation/AppNavigator';
-import AudioGuidesScreen from './src/screens/AudioGuidesScreen';
-import ChatScreen from './src/screens/ChatScreen';
-import CreateGoalScreen from './src/screens/CreateGoalScreen';
-import EditPasswordScreen from './src/screens/EditPasswordScreen';
-import EditProfileScreen from './src/screens/EditProfileScreen';
 import FullNameScreen from './src/screens/FullNameScreen';
 import GenreSelectionScreen from './src/screens/GenreSelectionScreen';
-import GoalsScreen from './src/screens/GoalsScreen';
-import JournalEntryScreen from './src/screens/JournalEntryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import RewardsScreen from './src/screens/RewardsScreen';
 import StoreScreen from './src/screens/StoreScreen';
 import SubscriptionScreen from './src/screens/SubscriptionScreen';
@@ -176,14 +166,7 @@ function AppNavigator() {
           // Fully onboarded user screens
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
-            <Stack.Screen name="Goals" component={GoalsScreen} />
-            <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
-            <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="EditPassword" component={EditPasswordScreen} />
             <Stack.Screen name="Subscription" component={SubscriptionScreen} />
             <Stack.Screen name="Store" component={StoreScreen} />
             <Stack.Screen name="Rewards" component={RewardsScreen} />
@@ -203,8 +186,6 @@ function AppNavigator() {
             <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           ) : null}
           <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
           <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
         </>
       )}
