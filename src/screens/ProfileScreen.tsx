@@ -102,11 +102,6 @@ const ProfileScreen = () => {
               </View>
             </View>
 
-            <View style={styles.bioSection}>
-              <Text style={styles.bioTitle}>Bio</Text>
-              <Text style={styles.bioText}>No bio set yet.</Text>
-            </View>
-
             <View style={styles.detailsRow}>
               <View style={styles.detailItem}>
                 <Calendar size={16} color="#8C8C8C" />
@@ -280,19 +275,7 @@ const styles = StyleSheet.create({
     fontFamily: 'BuenosAires-Book',
     color: '#8C8C8C',
   },
-  bioSection: {
-    gap: 8,
-  },
-  bioTitle: {
-    fontSize: 16,
-    fontFamily: 'BuenosAires-SemiBold',
-    color: '#333333',
-  },
-  bioText: {
-    fontSize: 16,
-    fontFamily: 'BuenosAires-Book',
-    color: '#8C8C8C',
-  },
+
   detailsRow: {
     flexDirection: 'row',
     gap: 24,
