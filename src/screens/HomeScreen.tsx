@@ -119,7 +119,10 @@ const HomeScreen = () => {
             <Text style={styles.studioName}>{studioName}</Text>
             <Text style={styles.studioGenres}>{genreText}</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton}>
+          <TouchableOpacity 
+            style={styles.settingsButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
             <Setting2 size={24} color="#8C8C8C" />
           </TouchableOpacity>
         </View>

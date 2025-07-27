@@ -12,6 +12,7 @@ import AudioGuidesScreen from '../screens/AudioGuidesScreen';
 import ExploreScreen from '../screens/ExploreScreen';
 import ShopScreen from '../screens/ShopScreen';
 import StudiosScreen from '../screens/StudiosScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import RecommendedForYouScreen from '../screens/RecommendedForYouScreen';
 import StoreScreen from '../screens/StoreScreen';
 import BeginProductionScreen from '../screens/BeginProductionScreen';
@@ -40,6 +41,7 @@ export type AppStackParamList = {
     lastPosition?: number;
   };
   Studios: undefined;
+  Profile: undefined;
   RecommendedForYou: undefined;
   Store: undefined;
   MovieDetail: { movieId: string };
@@ -115,6 +117,7 @@ export const AppNavigator = () => {
       <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
       <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
       <Stack.Screen name="Studios" component={StudiosScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="RecommendedForYou" component={RecommendedForYouScreen} />
       <Stack.Screen name="Store" component={StoreScreen} />
       <Stack.Screen name="MovieDetail" component={MovieDetailScreen} />
