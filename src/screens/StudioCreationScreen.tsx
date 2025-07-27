@@ -10,7 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { useAuth } from "../contexts/AuthContext";
@@ -34,9 +34,58 @@ interface StudioCreationScreenProps {
 
 const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) => {
   const { nickname } = route.params;
-  const { user, signOut } = useAuth();
-  const [studioName, setStudioName] = useState('');
+  const { user } = useAuth();
+    const [studioName, setStudioName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [validationMessage, setValidationMessage] = useState('');
+
+  const checkStudioNameAvailability = useCallback(async (name: string) => {
+    if (name.length < 3) {
+      setIsAvailable(null);
+      setValidationMessage('');
+      return;
+    }
+
+    setIsChecking(true);
+    setIsAvailable(null);
+    setValidationMessage('');
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('studio_name')
+        .eq('studio_name', name)
+        .limit(1);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setIsAvailable(false);
+        setValidationMessage('This name is already taken.');
+      } else {
+        setIsAvailable(true);
+        setValidationMessage('This name is available!');
+      }
+    } catch (error) {
+      console.error('Error checking studio name:', error);
+      setValidationMessage('Could not verify name.');
+      setIsAvailable(null);
+    } finally {
+      setIsChecking(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      checkStudioNameAvailability(studioName.trim());
+    }, 500); // 500ms debounce delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [studioName, checkStudioNameAvailability]);
 
 
 
@@ -71,8 +120,8 @@ const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) 
   );
 
   const handleContinue = async () => {
-    if (!studioName.trim()) {
-      Alert.alert("Invalid Name", "Please enter a name for your studio.");
+    if (!studioName.trim() || !isAvailable) {
+      Alert.alert("Invalid Name", "Please enter a valid and available name for your studio.");
       return;
     }
     if (!user?.id) {
@@ -106,22 +155,7 @@ const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) 
     }
   };
 
-  const handleSignOut = async () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out? You'll need to start the onboarding process again.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Sign Out", 
-          style: "destructive",
-          onPress: async () => {
-            await signOut();
-          }
-        }
-      ]
-    );
-  };
+
 
   return (
     <View style={styles.container}>
@@ -130,7 +164,7 @@ const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) 
       {/* Header with back button and progress */}
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
-        <ProgressDots currentStep={1} totalSteps={2} />
+        <ProgressDots currentStep={1} totalSteps={3} />
       </View>
 
       {/* Main content */}
@@ -151,22 +185,31 @@ const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) 
             autoCapitalize="words"
             autoCorrect={false}
           />
+          <View style={styles.validationContainer}>
+            {isChecking ? (
+              <ActivityIndicator size="small" color="#B7B7B7" />
+            ) : validationMessage ? (
+              <Text style={[styles.validationText, isAvailable ? styles.availableText : styles.takenText]}>
+                {validationMessage}
+              </Text>
+            ) : null}
+          </View>
           
 
           
-          {/* Sign out option */}
-          <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-            <Text style={styles.signOutText}>Need to start over? Sign out</Text>
-          </TouchableOpacity>
+
         </View>
       </View>
 
       {/* Bottom continue button */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          style={[styles.continueButton, loading && styles.continueButtonDisabled]}
+          style={[
+            styles.continueButton,
+            (loading || !isAvailable) && styles.continueButtonDisabled,
+          ]}
           onPress={handleContinue}
-          disabled={loading}
+          disabled={loading || !isAvailable}
         >
           {loading ? (
             <ActivityIndicator color="#F5F5F5" />
@@ -309,17 +352,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'BuenosAires-SemiBold',
   },
-  signOutButton: {
-    alignSelf: 'center',
-    marginTop: 20,
-    padding: 10,
+  validationContainer: {
+    height: 20,
+    marginTop: -16, // Pull it up to be closer to the input
+    marginBottom: 16, // Add space below it
+    alignItems: 'center', // Center the content
   },
-  signOutText: {
-    color: '#8C8C8C',
+  validationText: {
     fontSize: 14,
-    fontFamily: 'BuenosAires-Book',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
+    fontFamily: 'BuenosAires-Book', // Match other text
+  },
+  availableText: {
+    color: '#28A745', // Green for available
+  },
+  takenText: {
+    color: '#DC3545', // Red for taken
   },
 });
 

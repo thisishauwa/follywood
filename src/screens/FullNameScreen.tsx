@@ -134,7 +134,7 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
       {/* Header with back button and progress */}
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
-        <ProgressDots currentStep={0} totalSteps={2} />
+        <ProgressDots currentStep={0} totalSteps={3} />
       </View>
 
       {/* Main content */}

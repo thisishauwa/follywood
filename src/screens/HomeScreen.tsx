@@ -46,11 +46,45 @@ interface Movie {
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user } = useAuth();
-  const [accountBalance] = useState(945200);
-  const [dailyChange] = useState(2000);
-  const [fanCount] = useState(12);
+    const [dailyPercentChange, setDailyPercentChange] = useState<number>(0);
+
+  // Fetch historical data to calculate real daily change
+  const fetchDailyChange = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('daily_profile_snapshots')
+      .select('cash_balance')
+      .eq('profile_id', user.id)
+      .order('snapshot_date', { ascending: false })
+      .limit(2);
+
+    if (error) {
+      console.error('Error fetching daily snapshots:', error);
+      return;
+    }
+
+    if (data && data.length === 2) {
+      const [today, yesterday] = data;
+      if (yesterday.cash_balance > 0) {
+        const change = ((today.cash_balance - yesterday.cash_balance) / yesterday.cash_balance) * 100;
+        setDailyPercentChange(change);
+      } else {
+        setDailyPercentChange(0); // Avoid division by zero
+      }
+    } else {
+      // Not enough data to compare, so change is 0
+      setDailyPercentChange(0);
+    }
+  };
+
+  // Fetch daily change when the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDailyChange();
+    }, [user])
+  );
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [movieCount, setMovieCount] = useState(0);
 
   // Fetch user's movies from Supabase
   const fetchMovies = async () => {
@@ -63,7 +97,6 @@ const HomeScreen = () => {
       if (!studio) {
         // No studio yet, no movies to show
         setMovies([]);
-        setMovieCount(0);
         return;
       }
 
@@ -80,29 +113,27 @@ const HomeScreen = () => {
       }
 
       setMovies(data || []);
-      setMovieCount(data?.length || 0);
     } catch (error) {
       console.error("Unexpected error fetching movies:", error);
     }
   };
 
   // Fetch movies when component mounts and when screen is focused
-  useEffect(() => {
-    fetchMovies();
-  }, [user]);
-
   useFocusEffect(
     React.useCallback(() => {
       fetchMovies();
     }, [user])
   );
 
-  // Get user's studio name and genres for display
+  // Get user's studio name, genres, and stats for display
   const studioName = user?.profile?.studio_name || "Your Studio";
-  const userGenres = user?.profile?.genre
-    ? [user.profile.genre]
-    : ["Action", "Comedy", "Thriller"];
-  const genreText = userGenres.join(", ") + " Studio";
+  const userGenres = user?.profile?.selected_genres?.length
+    ? user.profile.selected_genres
+    : [];
+  const genreText = userGenres.length > 0 ? userGenres.join(" / ") + " Studio" : "No Genres Selected";
+  const fanCount = user?.profile?.fans ?? 0;
+  const movieCount = user?.profile?.film_count ?? 0;
+  const accountBalance = user?.profile?.cash ?? 1000000;
 
   return (
     <View style={styles.container}>
@@ -153,8 +184,11 @@ const HomeScreen = () => {
                   ${accountBalance.toLocaleString()}
                 </Text>
               </View>
-              <Text style={styles.balanceChange}>
-                +${dailyChange.toLocaleString()}.00
+              <Text style={[
+                styles.balanceChange,
+                dailyPercentChange >= 0 ? styles.positiveChange : styles.negativeChange
+              ]}>
+                {dailyPercentChange >= 0 ? '+' : ''}{dailyPercentChange.toFixed(2)}%
               </Text>
             </View>
           </ImageBackground>
@@ -349,8 +383,13 @@ const styles = StyleSheet.create({
   },
   balanceChange: {
     fontSize: 16,
-    fontFamily: "BuenosAires-Book",
-    color: "#71CC40",
+    fontFamily: 'Satoshi-Bold',
+  },
+  positiveChange: {
+    color: '#28A745', // Green
+  },
+  negativeChange: {
+    color: '#DC3545', // Red
   },
   getStartedSection: {
     gap: 16,

@@ -16,9 +16,12 @@ export interface Profile {
   sexuality?: string
   relationship_status?: 'single' | 'dating' | 'married' | 'other'
   onboarding_completed?: boolean
-  studio_name?: string
-  genre?: string
-  selected_genres?: string[]
+  studio_name: string | null;
+  genre: string | null;
+  selected_genres: string[] | null;
+  cash: number | null;
+  fans: number | null;
+  film_count: number | null;
   referral_code?: string
   referred_by?: string
   points?: number

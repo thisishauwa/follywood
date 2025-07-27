@@ -36,7 +36,7 @@ interface GenreSelectionScreenProps {
 const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
   const [loading, setLoading] = useState(false);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const { user, signOut, refreshProfile } = useAuth();
+  const { user, refreshProfile } = useAuth();
 
   const genres = [
     "Action", "Comedy", "Drama", "Horror", 
@@ -98,11 +98,9 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
     console.log('Starting profile update...');
     setLoading(true);
     try {
-      // Store the first genre in the genre field for compatibility
-      // and store all selected genres in the selected_genres array
+      // Save the selected genres as an array
       const updateData = {
-        genre: selectedGenres[0], // Primary genre for compatibility
-        selected_genres: selectedGenres, // All selected genres as array
+        selected_genres: selectedGenres,
         onboarding_completed: true,
         updated_at: new Date().toISOString(),
       };
@@ -136,22 +134,7 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
     }
   };
 
-  const handleSignOut = async () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out? You'll need to start the onboarding process again.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Sign Out", 
-          style: "destructive",
-          onPress: async () => {
-            await signOut();
-          }
-        }
-      ]
-    );
-  };
+
 
   const handleGenreToggle = (genre: string) => {
     if (selectedGenres.includes(genre)) {
@@ -239,10 +222,7 @@ const GenreSelectionScreen = ({ navigation }: GenreSelectionScreenProps) => {
           </View>
         </View>
 
-        {/* Sign out option */}
-        <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-          <Text style={styles.signOutText}>Need to start over? Sign out</Text>
-        </TouchableOpacity>
+
         
         {/* Bottom padding to ensure content can scroll above the button */}
         <View style={styles.bottomPadding} />

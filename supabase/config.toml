@@ -1,0 +1,4 @@
+# Supabase project configuration
+
+[functions."create-daily-snapshot"]
+schedule = "0 0 * * *" # This runs the function at midnight UTC every day

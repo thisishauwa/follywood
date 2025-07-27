@@ -26,7 +26,7 @@
 **Gameplay Loop:**
 
 1. **Create Studio & Branding**
-2. **Choose script from marketplace or write own (see Section 4)**
+2. **Choose script from marketplace/ffrom the scripts you've bought**
 3. **Hire cast and crew**
 4. **Set production and marketing budget**
 5. **Release film in chosen season**
@@ -57,7 +57,6 @@
 
 - Scripts are rated (★☆☆☆☆ to ★★★★★)
 - Higher quality scripts cost more or require experience to unlock
-- Option to write your own script = mini-game or long-term reward
 - Genre/script matchups affect box office performance
 
 **C. Crew & Talent**
