@@ -18,7 +18,7 @@ import { useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm, Controller } from "react-hook-form";
-import { ArrowLeft2 } from "iconsax-react-nativejs";
+
 
 // Navigation types
 type RootStackParamList = {
@@ -47,43 +47,6 @@ interface FormData {
 
 // --- Utilities ---
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
-
-// --- Reusable Components ---
-
-interface ProgressDotsProps {
-  currentStep: number;
-  totalSteps: number;
-}
-
-const ProgressDots = ({ currentStep, totalSteps }: ProgressDotsProps) => (
-  <View style={styles.progressContainer}>
-    {Array.from({ length: totalSteps }, (_, index) => (
-      <View
-        key={index}
-        style={[
-          styles.progressDot,
-          index === currentStep ? styles.progressDotActive : styles.progressDotInactive,
-        ]}
-      />
-    ))}
-  </View>
-);
-
-interface BackButtonProps {
-  onPress: () => void;
-}
-
-const BackButton = ({ onPress }: BackButtonProps) => (
-  <TouchableOpacity style={styles.backButton} onPress={onPress}>
-    <ArrowLeft2 size={24} color="#2E2E2E" />
-  </TouchableOpacity>
-);
-
-
-
-
-
-
 
 // --- Main LoginScreen Component ---
 const LoginScreen = ({ navigation }: LoginScreenProps) => {
@@ -163,30 +126,23 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
     }
   };
 
-
-
   const handleContactSupport = () => {
     Linking.openURL(
       "mailto:support@fantasyfilmleague.com?subject=Login%20Help"
     );
   };
 
-
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
-      {/* Header with back button and progress */}
-      <View style={styles.header}>
-        <BackButton onPress={() => navigation.goBack()} />
-        <ProgressDots currentStep={0} totalSteps={3} />
-      </View>
+
+      {/* Header spacer for status bar */}
+      <View style={styles.headerSpacer} />
 
       {/* Main content */}
       <View style={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Hey, welcome to Follywood 👋</Text>
+          <Text style={styles.welcomeText}>Sign in with OTP</Text>
           <Text style={styles.questionText}>
             {otpSent ? "Enter the code we sent" : "What's your email?"}
           </Text>
@@ -246,9 +202,13 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
               )}
             />
           )}
-          {!otpSent && errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
-          {otpSent && errors.token && <Text style={styles.errorText}>{errors.token.message}</Text>}
-          
+          {!otpSent && errors.email && (
+            <Text style={styles.errorText}>{errors.email.message}</Text>
+          )}
+          {otpSent && errors.token && (
+            <Text style={styles.errorText}>{errors.token.message}</Text>
+          )}
+
           {otpSent && (
             <TouchableOpacity
               onPress={() => setOtpSent(false)}
@@ -263,7 +223,10 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       {/* Bottom continue button */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          style={[styles.continueButton, loading && styles.continueButtonDisabled]}
+          style={[
+            styles.continueButton,
+            loading && styles.continueButtonDisabled,
+          ]}
           onPress={async () => {
             if (!otpSent) {
               const isValid = await trigger("email");
@@ -281,7 +244,7 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
             <Text style={styles.continueButtonText}>Continue</Text>
           )}
         </TouchableOpacity>
-        
+
         {/* The native home indicator will be shown against the container background */}
       </View>
     </View>
@@ -291,114 +254,87 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+  headerSpacer: {
     paddingTop: 75,
     paddingBottom: 20,
   },
-  backButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 
-  progressContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  progressDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  progressDotActive: {
-    backgroundColor: '#EE4C01',
-  },
-  progressDotInactive: {
-    backgroundColor: '#F0EEE9',
-  },
+
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
   welcomeSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 100,
     marginBottom: 32,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#8C8C8C',
-    fontFamily: 'BuenosAires-Book',
-    textAlign: 'center',
+    color: "#8C8C8C",
+    fontFamily: "BuenosAires-Book",
+    textAlign: "center",
     marginBottom: 4,
   },
   questionText: {
     fontSize: 30,
-    color: '#343333',
-    fontFamily: 'BuenosAires-SemiBold',
-    textAlign: 'center',
+    color: "#343333",
+    fontFamily: "BuenosAires-SemiBold",
+    textAlign: "center",
   },
   inputContainer: {
     paddingHorizontal: 0,
   },
   input: {
-    backgroundColor: '#F7F7F7',
+    backgroundColor: "#F7F7F7",
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    fontFamily: 'BuenosAires-Book',
-    color: '#343333',
-    textAlign: 'center',
+    fontFamily: "BuenosAires-Book",
+    color: "#343333",
+    textAlign: "center",
   },
   errorText: {
-    color: '#EE4C01',
+    color: "#EE4C01",
     fontSize: 14,
     marginTop: 8,
-    fontFamily: 'BuenosAires-Book',
-    textAlign: 'center',
+    fontFamily: "BuenosAires-Book",
+    textAlign: "center",
   },
   changeEmailButton: {
     marginTop: 16,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   changeEmailText: {
-    color: '#8C8C8C',
+    color: "#8C8C8C",
     fontSize: 16,
-    fontFamily: 'BuenosAires-Book',
-    textDecorationLine: 'underline',
+    fontFamily: "BuenosAires-Book",
+    textDecorationLine: "underline",
   },
   bottomContainer: {
-    backgroundColor: '#2201B2',
+    backgroundColor: "#2201B2",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
     height: 120,
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   continueButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10, // Pushes the button down slightly from the top
   },
   continueButtonDisabled: {
     opacity: 0.6,
   },
   continueButtonText: {
-    color: '#F5F5F5',
+    color: "#F5F5F5",
     fontSize: 18,
-    fontFamily: 'BuenosAires-SemiBold',
+    fontFamily: "BuenosAires-SemiBold",
   },
-
 });
 
 export default LoginScreen;
