@@ -10,12 +10,18 @@ import GoalsScreen from '../screens/GoalsScreen';
 import CreateGoalScreen from '../screens/CreateGoalScreen';
 import AudioGuidesScreen from '../screens/AudioGuidesScreen';
 import ExploreScreen from '../screens/ExploreScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ShopScreen from '../screens/ShopScreen';
+import StudiosScreen from '../screens/StudiosScreen';
 import RecommendedForYouScreen from '../screens/RecommendedForYouScreen';
-import StoreScreen from '../screens/StoreScreen'; 
+import StoreScreen from '../screens/StoreScreen';
+import BeginProductionScreen from '../screens/BeginProductionScreen';
+import CastSelectionScreen from '../screens/CastSelectionScreen';
+import DirectorSelectionScreen from '../screens/DirectorSelectionScreen';
+import ProductionBudgetScreen from '../screens/ProductionBudgetScreen';
+import MovieDetailScreen from '../screens/MovieDetailScreen';
+import EditMovieScreen from '../screens/EditMovieScreen';
 
 import BottomNavBar from '../components/BottomNavBar';
-import FloatingAugustButton from '../components/FloatingAugustButton';
 import MiniPlayer from '../components/MiniPlayer';
 import useAudioPlayerStore from '../stores/audioPlayerStore';
 
@@ -33,41 +39,35 @@ export type AppStackParamList = {
     description?: string;
     lastPosition?: number;
   };
-  Profile: undefined;
+  Studios: undefined;
   RecommendedForYou: undefined;
   Store: undefined;
+  MovieDetail: { movieId: string };
+  EditMovie: { movieId: string };
 };
 
 export type TabParamList = {
   Home: undefined;
   Explore: undefined;
-  Journal: undefined;
-  Goals: undefined;
+  Shop: undefined;
+  Studios: undefined;
+  BeginProduction: undefined;
+  CastSelection: { filmTitle: string };
+  DirectorSelection: { filmTitle: string; selectedActors: string[] };
+  ProductionBudget: { 
+    filmTitle: string;
+    selectedActors: string[]; 
+    selectedDirector: string;
+    scriptCost: number;
+    castCost: number;
+    directorCost: number;
+  };
 };
 
 const Stack = createStackNavigator<AppStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Wrapper component to add FloatingAugustButton to any screen
-const withFloatingButton = (Component: React.ComponentType<any>) => {
-  return (props: any) => {
-    const { currentTrack } = useAudioPlayerStore();
-    return (
-      <View style={{ flex: 1 }}>
-        <Component {...props} />
-        <View style={{ bottom: currentTrack ? 60 : 0 }}>
-          <FloatingAugustButton />
-        </View>
-      </View>
-    );
-  };
-};
 
-// Wrap all tab screens with the floating button
-const HomeScreenWithFAB = withFloatingButton(HomeScreen);
-const ExploreScreenWithFAB = withFloatingButton(ExploreScreen);
-const JournalScreenWithFAB = withFloatingButton(JournalListScreen);
-const GoalsScreenWithFAB = withFloatingButton(GoalsScreen);
 
 export const MainTabs = () => {
   return (
@@ -77,9 +77,29 @@ export const MainTabs = () => {
         tabBar={(props) => <BottomNavBar {...props} />}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Explore" component={ExploreScreenWithFAB} />
-        <Tab.Screen name="Journal" component={JournalScreenWithFAB} />
-        <Tab.Screen name="Goals" component={GoalsScreenWithFAB} />
+        <Tab.Screen name="Explore" component={ExploreScreen} />
+        <Tab.Screen name="Shop" component={ShopScreen} />
+        <Tab.Screen name="Studios" component={StudiosScreen} />
+        <Tab.Screen 
+          name="BeginProduction" 
+          component={BeginProductionScreen} 
+          options={{ tabBarButton: () => null }} 
+        />
+        <Tab.Screen 
+          name="CastSelection" 
+          component={CastSelectionScreen} 
+          options={{ tabBarButton: () => null }} 
+        />
+        <Tab.Screen 
+          name="DirectorSelection" 
+          component={DirectorSelectionScreen} 
+          options={{ tabBarButton: () => null }} 
+        />
+        <Tab.Screen 
+          name="ProductionBudget" 
+          component={ProductionBudgetScreen} 
+          options={{ tabBarButton: () => null }} 
+        />
       </Tab.Navigator>
       <MiniPlayer />
     </View>
@@ -94,9 +114,11 @@ export const AppNavigator = () => {
       <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
       <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
       <Stack.Screen name="AudioGuides" component={AudioGuidesScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Studios" component={StudiosScreen} />
       <Stack.Screen name="RecommendedForYou" component={RecommendedForYouScreen} />
       <Stack.Screen name="Store" component={StoreScreen} />
+      <Stack.Screen name="MovieDetail" component={MovieDetailScreen} />
+      <Stack.Screen name="EditMovie" component={EditMovieScreen} />
     </Stack.Navigator>
   );
 };

@@ -1,91 +1,35 @@
 import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import {
-  Home2,
-  Chart,
-  Briefcase,
-  User,
-} from 'iconsax-react-nativejs';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Home, Discover, Shop, User } from 'iconsax-react-native';
 
-// --- TYPES ---
-
-interface NavItemProps {
-  label: string;
-  icon: React.ReactNode;
-  activeIcon: React.ReactNode;
-  isActive: boolean;
-  onPress: () => void;
+interface BottomNavBarProps {
+  state: any;
+  descriptors: any;
+  navigation: any;
 }
 
-// --- COLORS ---
+const BottomNavBar: React.FC<BottomNavBarProps> = ({ state, descriptors, navigation }) => {
+  const insets = useSafeAreaInsets();
 
-const colors = {
-  active: '#FFFFFF',
-  inactive: '#868686',
-  background: '#1F1F1F',
-};
-
-// --- STYLES ---
-
-
-
-const styles = StyleSheet.create({
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 35,
-    left: 59,
-    right: 59,
-    height: 72,
-    backgroundColor: colors.background,
-    borderRadius: 36,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  navItem: {
-    alignItems: 'center',
-    padding: 8,
-  },
-});
-
-// --- NAV ITEM COMPONENT ---
-
-const NavItem: React.FC<NavItemProps & { activeColor?: string }> = ({ icon, activeIcon, isActive, onPress }) => (
-  <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    {isActive ? activeIcon : icon}
-  </TouchableOpacity>
-);
-
-// --- BOTTOM NAV BAR COMPONENT ---
-
-const BottomNavBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
-  const getIcon = (routeName: string, isFocused: boolean) => {
-    const color = isFocused ? colors.active : colors.inactive;
-    const variant = isFocused ? 'Bold' : 'Linear';
-
-    switch (routeName) {
-      case 'Home':
-        return <Home2 size={24} color={color} variant={variant as any} />;
-      case 'Explore':
-        return <Chart size={24} color={color} variant={variant as any} />;
-      case 'Journal':
-        return <Briefcase size={24} color={color} variant={variant as any} />;
-      case 'Goals':
-        return <User size={24} color={color} variant={variant as any} />;
-      default:
-        return null;
-    }
+  const icons: { [key: string]: any } = {
+    Home: Home,
+    Explore: Discover,
+    Shop: Shop,
+    Studios: User,
   };
 
   return (
-    <View style={styles.navBarContainer}>
-      {state.routes.map((route, index) => {
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+      {state.routes.map((route: any, index: number) => {
+        const { options } = descriptors[route.key];
+        const label = options.tabBarLabel !== undefined ? options.tabBarLabel : options.title !== undefined ? options.title : route.name;
+
+        // Hide production flow screens from tab bar
+        if (['BeginProduction', 'CastSelection', 'DirectorSelection', 'ProductionBudget'].includes(route.name)) {
+          return null;
+        }
+
         const isFocused = state.index === index;
 
         const onPress = () => {
@@ -100,19 +44,63 @@ const BottomNavBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
           }
         };
 
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        const IconComponent = icons[route.name];
+
         return (
-          <NavItem
+          <TouchableOpacity
             key={route.key}
-            label={route.name}
-            icon={getIcon(route.name, false)!}
-            activeIcon={getIcon(route.name, true)!}
-            isActive={isFocused}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
             onPress={onPress}
-          />
+            onLongPress={onLongPress}
+            style={styles.tabButton}
+          >
+            {IconComponent && (
+              <IconComponent
+                size={24}
+                color={isFocused ? '#EE4C01' : '#8C8C8C'}
+                variant={isFocused ? 'Bold' : 'Outline'}
+              />
+            )}
+            <Text style={[styles.label, { color: isFocused ? '#EE4C01' : '#8C8C8C' }]}>
+              {label}
+            </Text>
+          </TouchableOpacity>
         );
       })}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+    paddingTop: 8,
+    paddingHorizontal: 16,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 4,
+  },
+  label: {
+    fontSize: 12,
+    fontFamily: 'BuenosAires-Medium',
+  },
+});
 
 export default BottomNavBar;

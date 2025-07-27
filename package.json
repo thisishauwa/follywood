@@ -36,6 +36,7 @@
     "expo-status-bar": "~2.2.3",
     "expo-task-manager": "~13.1.6",
     "expo-updates": "~0.28.17",
+    "iconsax-react-native": "^0.0.8",
     "iconsax-react-nativejs": "^0.0.8",
     "immer": "^10.1.1",
     "lucide-react-native": "^0.525.0",
