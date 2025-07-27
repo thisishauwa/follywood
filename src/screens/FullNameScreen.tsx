@@ -16,11 +16,15 @@ import { useAuth } from "../contexts/AuthContext";
 import { useForm, Controller } from "react-hook-form";
 import { ArrowLeft2 } from "iconsax-react-nativejs";
 import { supabase } from "../services/supabase";
+import { generateNickname, extractFirstName } from "../utils/nicknameService";
 
 // Navigation types
 type RootStackParamList = {
+  Login: undefined;
   FullName: undefined;
-  StudioCreation: undefined;
+  StudioCreation: { nickname: string };
+  GenreSelection: undefined;
+  MainTabs: undefined;
 };
 
 type FullNameScreenNavigationProp = StackNavigationProp<
@@ -51,7 +55,9 @@ const ProgressDots = ({ currentStep, totalSteps }: ProgressDotsProps) => (
         key={index}
         style={[
           styles.progressDot,
-          index === currentStep ? styles.progressDotActive : styles.progressDotInactive,
+          index === currentStep
+            ? styles.progressDotActive
+            : styles.progressDotInactive,
         ]}
       />
     ))}
@@ -94,23 +100,27 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update({
           full_name: data.fullName,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq("id", user.id);
 
       if (error) {
-        console.error('Error updating profile with full name:', error);
+        console.error("Error updating profile with full name:", error);
         Alert.alert("Error", "Failed to save your name. Please try again.");
         return;
       }
 
-      // Navigate to studio creation screen
-      navigation.navigate('StudioCreation');
+      // Generate nickname from first name
+      const firstName = extractFirstName(data.fullName);
+      const nickname = await generateNickname(firstName);
+      
+      // Navigate to studio creation screen with nickname
+      navigation.navigate("StudioCreation", { nickname });
     } catch (error) {
-      console.error('Unexpected error saving full name:', error);
+      console.error("Unexpected error saving full name:", error);
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -120,7 +130,7 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
+
       {/* Header with back button and progress */}
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
@@ -130,8 +140,8 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
       {/* Main content */}
       <View style={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Let's get to know you 👋</Text>
-          <Text style={styles.questionText}>What's your full name?</Text>
+          <Text style={styles.welcomeText}>Hey, welcome to Follywood 👋</Text>
+          <Text style={styles.questionText}>What's your name?</Text>
         </View>
 
         {/* Input field */}
@@ -161,14 +171,19 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
               />
             )}
           />
-          {errors.fullName && <Text style={styles.errorText}>{errors.fullName.message}</Text>}
+          {errors.fullName && (
+            <Text style={styles.errorText}>{errors.fullName.message}</Text>
+          )}
         </View>
       </View>
 
       {/* Bottom continue button */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          style={[styles.continueButton, loading && styles.continueButtonDisabled]}
+          style={[
+            styles.continueButton,
+            loading && styles.continueButtonDisabled,
+          ]}
           onPress={async () => {
             const isValid = await trigger("fullName");
             if (isValid) handleSubmit(handleContinue)();
@@ -181,7 +196,7 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
             <Text style={styles.continueButtonText}>Continue</Text>
           )}
         </TouchableOpacity>
-        
+
         {/* The native home indicator will be shown against the container background */}
       </View>
     </View>
@@ -191,12 +206,12 @@ const FullNameScreen = ({ navigation }: FullNameScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 75,
     paddingBottom: 20,
@@ -204,13 +219,13 @@ const styles = StyleSheet.create({
   backButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   progressContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   progressDot: {
@@ -219,73 +234,73 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   progressDotActive: {
-    backgroundColor: '#EE4C01',
+    backgroundColor: "#EE4C01",
   },
   progressDotInactive: {
-    backgroundColor: '#F0EEE9',
+    backgroundColor: "#F0EEE9",
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
   welcomeSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 100,
     marginBottom: 32,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#8C8C8C',
-    fontFamily: 'BuenosAires-Book',
-    textAlign: 'center',
+    color: "#8C8C8C",
+    fontFamily: "BuenosAires-Book",
+    textAlign: "center",
     marginBottom: 4,
   },
   questionText: {
     fontSize: 30,
-    color: '#343333',
-    fontFamily: 'BuenosAires-SemiBold',
-    textAlign: 'center',
+    color: "#343333",
+    fontFamily: "BuenosAires-SemiBold",
+    textAlign: "center",
   },
   inputContainer: {
     paddingHorizontal: 0,
   },
   input: {
-    backgroundColor: '#F7F7F7',
+    backgroundColor: "#F7F7F7",
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    fontFamily: 'BuenosAires-Book',
-    color: '#343333',
-    textAlign: 'center',
+    fontFamily: "BuenosAires-Book",
+    color: "#343333",
+    textAlign: "center",
   },
   errorText: {
-    color: '#EE4C01',
+    color: "#EE4C01",
     fontSize: 14,
     marginTop: 8,
-    fontFamily: 'BuenosAires-Book',
-    textAlign: 'center',
+    fontFamily: "BuenosAires-Book",
+    textAlign: "center",
   },
   bottomContainer: {
-    backgroundColor: '#2201B2',
+    backgroundColor: "#2201B2",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
     height: 120,
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   continueButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   continueButtonDisabled: {
     opacity: 0.6,
   },
   continueButtonText: {
-    color: '#F5F5F5',
+    color: "#F5F5F5",
     fontSize: 18,
-    fontFamily: 'BuenosAires-SemiBold',
+    fontFamily: "BuenosAires-SemiBold",
   },
 });
 

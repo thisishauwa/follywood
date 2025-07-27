@@ -12,24 +12,28 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import { useAuth } from "../contexts/AuthContext";
 import { ArrowLeft2 } from "iconsax-react-nativejs";
 import { supabase } from "../services/supabase";
 
 type RootStackParamList = {
   FullName: undefined;
-  StudioCreation: undefined;
+  StudioCreation: { nickname: string };
   GenreSelection: undefined;
   MainTabs: undefined;
 };
 
 type StudioCreationScreenNavigationProp = StackNavigationProp<RootStackParamList, 'StudioCreation'>;
+type StudioCreationScreenRouteProp = RouteProp<RootStackParamList, 'StudioCreation'>;
 
 interface StudioCreationScreenProps {
   navigation: StudioCreationScreenNavigationProp;
+  route: StudioCreationScreenRouteProp;
 }
 
-const StudioCreationScreen = ({ navigation }: StudioCreationScreenProps) => {
+const StudioCreationScreen = ({ navigation, route }: StudioCreationScreenProps) => {
+  const { nickname } = route.params;
   const { user, signOut } = useAuth();
   const [studioName, setStudioName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -132,7 +136,7 @@ const StudioCreationScreen = ({ navigation }: StudioCreationScreenProps) => {
       {/* Main content */}
       <View style={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Almost there! 🎬</Text>
+          <Text style={styles.welcomeText}>Great, {nickname}. Walk with me.</Text>
           <Text style={styles.questionText}>What's your studio name?</Text>
         </View>
 

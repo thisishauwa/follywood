@@ -67,7 +67,8 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       email: "",
       token: "",
     },
-    mode: "onBlur",
+    mode: "onSubmit",
+    shouldUnregister: true,
   });
 
   // Step 1: Send OTP to user's email
